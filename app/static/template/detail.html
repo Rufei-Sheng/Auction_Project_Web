@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>detail</title>
+    <link rel="stylesheet" type="text/css" href="./css/iview.css">
+    <script type="text/javascript" src="./js/vue.js"></script>
+    <script type="text/javascript" src="./js/iview.js"></script>
+
+    <script type="text/javascript" src="./js/jq.js"></script>
+    <script type="text/javascript" src="./js/common.js"></script>
+    <script type="text/javascript" src="./js/moment.js"></script>
+
+    <style>
+        html, body, #app {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .layout {
+            border: 1px solid #d7dde4;
+            background: #f5f7f9;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .layout-logo {
+            width: 100px;
+            height: 30px;
+            background: #5b6270;
+            border-radius: 3px;
+            float: left;
+            position: relative;
+            top: 15px;
+            left: 20px;
+        }
+
+        .layout-nav {
+            /*width: 420px;*/
+            margin: 0 auto;
+            margin-right: 20px;
+        }
+
+        .ivu-layout-header {
+            padding: 0 0 0 50px;
+        }
+
+        .layout-logo {
+            width: auto;
+            height: 30px;
+            background: none;
+            line-height: 30px;
+            border-radius: 3px;
+            float: left;
+            position: relative;
+            top: 15px;
+            left: 20px;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .layout, .ivu-layout {
+            height: 100%;
+        }
+
+        .ivu-layout-sider {
+            background: #515a6e !important;
+        }
+
+        .layout-con {
+            height: 100%;
+            width: 100%;
+        }
+
+        .menu-item span {
+            display: inline-block;
+            overflow: hidden;
+            width: 120px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+            transition: width .2s ease .2s;
+        }
+
+        .menu-item i {
+            transform: translateX(0px);
+            transition: font-size .2s ease, transform .2s ease;
+            vertical-align: middle;
+            font-size: 16px;
+        }
+
+        .collapsed-menu span {
+            width: 0px;
+            transition: width .2s ease;
+        }
+
+        .collapsed-menu i {
+            transform: translateX(5px);
+            transition: font-size .2s ease .2s, transform .2s ease .2s;
+            vertical-align: middle;
+            font-size: 22px;
+        }
+        .box div{
+            text-align: center;
+            color: #000;
+            font-size: 18px;
+            line-height: 40px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <Header style=" background: #242f42; ">
+            <i-menu mode="horizontal" theme="dark" style=" background: #242f42;" @on-select=" click_header_menu ">
+                <div class="layout-logo" @click="  history.go(-1) ">
+                    Product Details
+                </div>
+                 <div class="layout-nav" style="float: right; ">
+
+                    <Submenu name="user"  >
+                        <template slot="title">
+                            <Icon type="md-person" ></Icon>
+                            Welcome,{{ username }}
+                        </template>
+                        <Menu-Item name="like">
+                            My Like
+                        </Menu-Item>
+                        <Menu-Item name="account">
+                            My Account
+                        </Menu-Item>
+                        <Menu-Item name="auction">
+                            My Auction
+                        </Menu-Item>
+                        <Menu-Item name="post">
+                            My Post
+                        </Menu-Item>
+                        <Menu-Item name="post_list">
+                            My Post List
+                        </Menu-Item>
+                        <Menu-Item name="login">
+                            Login out
+                        </Menu-Item>
+                    </Submenu>
+                </div>
+            </i-menu>
+
+        </Header>
+    <Row>
+        <i-col span="4" offset="3" style="padding: 20px;">
+            <img width="200" height="400" :src="item.fields.product_photo" alt="">
+        </i-col>
+        <i-col span="14" style="padding: 20px;" class="box">
+                <div>
+                    Product Condition: {{ item.fields.product_condition }}
+                </div>
+                <div>
+                    Minimum acceptable price: {{ item.fields.min_price }}
+                </div>
+            <div>
+                    Starting time: {{ moment(item.fields.start_time).format("YYYY-MM-DD hh:mm:ss") }}
+                </div>
+            <div>
+                    Ending time: {{ moment(item.fields.end_time).format("YYYY-MM-DD hh:mm:ss") }}
+                </div>
+            <div>
+                Description: {{ item.fields.desc }}
+            </div>
+            <div>
+                Delivery: {{ item.fields.delivery }}
+            </div>
+            <div>
+                <Icon type="md-heart-outline" v-if=" !prise " style="
+                     font-size: 40px;
+                    color: red;
+                    line-height: 180px;
+                " @click="add_prise(1)"></Icon>
+
+                <Icon type="md-heart" v-else style="
+                     font-size: 40px;
+                    color: red;
+                    line-height: 180px;
+                " @click="add_prise(0)"></Icon>
+
+            </div>
+            <div>
+                <i-button type="primary" @click=" price_model = 'true' ">
+                    Participate in auction
+                </i-button>
+            </div>
+        </i-col>
+    </Row>
+
+
+     <Modal v-model="price_model"  title="please enter you price" >
+            <div>
+                <input-number  v-model="buy_price"   :min="1" placeholder="enter" style="width: 100px;" >
+
+                    </input-number>
+            </div>
+            <div slot="footer">
+                <i-button type="primary" size="large" @click=" pai_mai">Confirm</i-button>
+            </div>
+    </Modal>
+
+
+
+</div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            price_model: false,
+            buy_price: null,
+            pay_model: false,
+
+            item: JSON.parse(localStorage.getItem('product')),
+            username: localStorage.getItem('username'),
+            prise: false,
+
+            paypal_number:"",
+            paypal_pawword:""
+        },
+        computed: {
+            menuitemClasses: function () {
+                return [
+                    'menu-item',
+                    this.isCollapsed ? 'collapsed-menu' : ''
+                ]
+            }
+        },
+        mounted(){
+            this.get_if_prise();
+        },
+        methods: {
+            add_prise(like){
+                apiAjax(APIURL.add_prise,'post',{
+                    product_id: this.item.pk,
+                    user_id: localStorage.getItem('uid'),
+                    like: like
+                },(ret)=>{
+                    console.log(ret);
+                    this.prise = !this.prise;
+                })
+            },
+            get_if_prise(){
+                apiAjax(APIURL.get_prise+'?product_id=' + this.item.pk+'&user_id=' +localStorage.getItem('uid'),'get',{},(ret)=>{
+                    if(!JSON.parse(ret.data)){
+                        this.prise = false;
+                    }else{
+                        this.prise = JSON.parse(ret.data)[0].fields.like;
+                    }
+                })
+            },
+            click_header_menu(name){
+                window.location.href = name+".html";
+            },
+            pai_mai(){
+                if(this.buy_price <  this.item.fields.min_price ){
+                    this.$Message.error("price is less min price")
+                }else {
+                    apiAjax(APIURL.add_buy,'post',{
+                        product_id: this.item.pk,
+                        user_id: localStorage.getItem('uid'),
+                        buy_price: this.buy_price
+                    },(ret)=>{
+                        this.price_model = false;
+                        this.buy_price = "";
+                    })
+                }
+            },
+            // pai_mai(){
+            //     if(this.paypal_number && this.paypal_pawword ){
+            //          apiAjax(APIURL.add_buy,'post',{
+            //             product_id: this.item.pk,
+            //             user_id: localStorage.getItem('uid'),
+            //             buy_price: this.buy_price
+            //         },(ret)=>{
+            //             this.price_model = false;
+            //             this.buy_price = "";
+            //         })
+            //     }else{
+            //         this.$Message.error("paypal_number and paypal_pawword is need")
+            //     }
+            //
+            // }
+        }
+    })
+</script>
+</html>

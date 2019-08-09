@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>register</title>
+    <link rel="stylesheet" type="text/css" href="./css/iview.css">
+    <script type="text/javascript" src="./js/vue.js"></script>
+    <script type="text/javascript" src="./js/iview.js"></script>
+    <script type="text/javascript" src="./js/jq.js"></script>
+    <script type="text/javascript" src="./js/common.js"></script>
+
+    <style>
+        html,body,#app{
+            height: 100%;
+        }
+        .login-wrap {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-image: url("./img/bg.jpg");
+            background-size: 100%;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .ms-login{
+            width: 420px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .ms-title {
+            width: 100%;
+            line-height: 50px;
+            text-align: center;
+            font-size: 20px;
+            color: #fff;
+            border-bottom: 1px solid #ddd;
+        }
+        .ms-content {
+            padding: 30px 30px;
+        }
+
+        .bottom_box{
+            font-size: 18px;
+            color: #fff;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .bottom_box span{
+            cursor: pointer;
+        }
+        .ivu-form .ivu-form-item-label {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="login-wrap">
+        <div class="ms-login" >
+            <div  class="ms-title">Sale Forum</div>
+            <i-form class="ms-content" ref="formInline" :model="formInline" :rules="ruleInline"  :label-width="130"  label-position="left">
+                <Form-Item prop="email" label="email">
+                    <i-input type="text" v-model="formInline.email" placeholder="please enter email" clearable >
+                    </i-input>
+                </Form-Item>
+                <Form-Item prop="password" label="password">
+                    <i-input type="password" v-model="formInline.password" placeholder="please enter password" clearable >
+                    </i-input>
+                </Form-Item>
+
+
+                <Form-Item prop="user_name" label="user_name">
+                    <i-input  v-model="formInline.user_name" placeholder="please enter user_name" clearable >
+                    </i-input>
+                </Form-Item>
+                <Form-Item prop="address" label="address">
+                    <i-input  v-model="formInline.address" placeholder="please enter address" clearable >
+                    </i-input>
+                </Form-Item>
+                 <Form-Item prop="cellphone" label="cellphone">
+                    <i-input  v-model="formInline.cellphone" placeholder="please enter cellphone" clearable >
+                    </i-input>
+                </Form-Item>
+
+                <Form-Item  prop="paypal_number" label="paypal number">
+                    <i-input  v-model="formInline.paypal_number" placeholder="please enter paypal_number" clearable >
+                    </i-input>
+                </Form-Item>
+
+                <i-button type="primary" long @click="handleSubmit('formInline')">register</i-button>
+
+                <div class="bottom_box">
+                    <span style="float: right;" @click=" window.location.href='login.html'  " >
+                        go login
+                    </span>
+                </div>
+            </i-form>
+
+        </div>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            formInline: {
+                email: '',
+                password: '',
+                user_name:'',
+                address:'',
+                cellphone:'',
+                paypal_number:''
+            },
+            ruleInline: {
+                email: [
+                    { required: true, message: 'email cannot empty ', trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, message: 'password cannot empty', trigger: 'blur' },
+                    { type: 'string', min: 6, message: 'password length need large 6', trigger: 'blur' }
+                ],
+
+                user_name: [
+                    { required: true, message: 'user_name cannot empty ', trigger: 'blur' }
+                ],
+                address: [
+                    { required: true, message: 'address cannot empty ', trigger: 'blur' }
+                ],
+                cellphone: [
+                    { required: true, message: 'cellphone cannot empty ', trigger: 'blur' }
+                ],
+                paypal_number: [
+                    { required: true, message: 'paypal_number cannot empty ', trigger: 'blur' }
+                ]
+            }
+        },
+        methods: {
+            handleSubmit(name) {
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        apiAjax(APIURL.register,'post',this.formInline,(ret)=>{
+                            this.$Message.success("register success");
+
+                        })
+                    } else {
+                        this.$Message.error('check form file,please check');
+                    }
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

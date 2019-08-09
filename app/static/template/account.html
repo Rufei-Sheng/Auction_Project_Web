@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>detail</title>
+    <link rel="stylesheet" type="text/css" href="./css/iview.css">
+    <script type="text/javascript" src="./js/vue.js"></script>
+    <script type="text/javascript" src="./js/iview.js"></script>
+
+    <script type="text/javascript" src="./js/jq.js"></script>
+    <script type="text/javascript" src="./js/common.js"></script>
+    <script type="text/javascript" src="./js/moment.js"></script>
+
+    <style>
+        html, body, #app {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .layout {
+            border: 1px solid #d7dde4;
+            background: #f5f7f9;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .layout-logo {
+            width: 100px;
+            height: 30px;
+            background: #5b6270;
+            border-radius: 3px;
+            float: left;
+            position: relative;
+            top: 15px;
+            left: 20px;
+        }
+
+        .layout-nav {
+            /*width: 420px;*/
+            margin: 0 auto;
+            margin-right: 20px;
+        }
+
+        .ivu-layout-header {
+            padding: 0 0 0 50px;
+        }
+
+        .layout-logo {
+            width: auto;
+            height: 30px;
+            background: none;
+            line-height: 30px;
+            border-radius: 3px;
+            float: left;
+            position: relative;
+            top: 15px;
+            left: 20px;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .layout, .ivu-layout {
+            height: 100%;
+        }
+
+        .ivu-layout-sider {
+            background: #515a6e !important;
+        }
+
+        .layout-con {
+            height: 100%;
+            width: 100%;
+        }
+
+        .menu-item span {
+            display: inline-block;
+            overflow: hidden;
+            width: 120px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+            transition: width .2s ease .2s;
+        }
+
+        .menu-item i {
+            transform: translateX(0px);
+            transition: font-size .2s ease, transform .2s ease;
+            vertical-align: middle;
+            font-size: 16px;
+        }
+
+        .collapsed-menu span {
+            width: 0px;
+            transition: width .2s ease;
+        }
+
+        .collapsed-menu i {
+            transform: translateX(5px);
+            transition: font-size .2s ease .2s, transform .2s ease .2s;
+            vertical-align: middle;
+            font-size: 22px;
+        }
+        .box div{
+            text-align: center;
+            color: #000;
+            font-size: 18px;
+            line-height: 40px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <Header style=" background: #242f42; ">
+            <i-menu mode="horizontal" theme="dark" style=" background: #242f42;" @on-select=" click_header_menu ">
+                <div class="layout-logo" @click="  history.go(-1) ">
+                    My Account
+                </div>
+                 <div class="layout-nav" style="float: right; ">
+
+                    <Submenu name="user"  >
+                        <template slot="title">
+                            <Icon type="md-person" ></Icon>
+                            Welcome,{{ username }}
+                        </template>
+                        <Menu-Item name="like">
+                            My Like
+                        </Menu-Item>
+                        <Menu-Item name="account">
+                            My Account
+                        </Menu-Item>
+                        <Menu-Item name="auction">
+                            My Auction
+                        </Menu-Item>
+                        <Menu-Item name="post">
+                            My Post
+                        </Menu-Item>
+                        <Menu-Item name="post_list">
+                            My Post List
+                        </Menu-Item>
+                        <Menu-Item name="login">
+                            Login out
+                        </Menu-Item>
+                    </Submenu>
+                </div>
+            </i-menu>
+
+        </Header>
+    <Row>
+        <i-col span="14" offset="5" style="padding: 20px;" class="box">
+            <i-form class="ms-content" ref="formInline" :model="formInline" :rules="ruleInline"  :label-width="130"  label-position="left">
+                <Form-Item prop="email" label="email">
+                    <i-input type="text" v-model="formInline.email" disabled placeholder="please enter email" clearable >
+                    </i-input>
+                </Form-Item>
+                <Form-Item prop="password" label="password">
+                    <i-input type="password" v-model="formInline.password" placeholder="please enter password" clearable >
+                    </i-input>
+                </Form-Item>
+
+
+                <Form-Item prop="user_name" label="user_name">
+                    <i-input  v-model="formInline.user_name" placeholder="please enter user_name" clearable >
+                    </i-input>
+                </Form-Item>
+                <Form-Item prop="address" label="address">
+                    <i-input  v-model="formInline.address" placeholder="please enter address" clearable >
+                    </i-input>
+                </Form-Item>
+                 <Form-Item prop="cellphone" label="cellphone">
+                    <i-input  v-model="formInline.cellphone" placeholder="please enter cellphone" clearable >
+                    </i-input>
+                </Form-Item>
+
+                <Form-Item prop="paypal_number" label="paypal number">
+                    <i-input  v-model="formInline.paypal_number" placeholder="please enter paypal_number" clearable >
+                    </i-input>
+                </Form-Item>
+
+                <i-button type="primary" long @click="handleSubmit('formInline')">change</i-button>
+                <i-button type="error" long @click="del_user_status = true" style="margin-top: 10px;">destrory</i-button>
+            </i-form>
+        </i-col>
+    </Row>
+
+    <Modal v-model="del_user_status"  title="please enter you destrory desc" >
+            <div>
+                <i-input  v-model="del_desc"   :min="1" placeholder="enter" style="width: 300px;" >
+
+                    </i-input>
+            </div>
+            <div slot="footer">
+                <i-button type="primary" size="large" @click=" del_user ">Confirm</i-button>
+            </div>
+    </Modal>
+
+</div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            del_user_status: false,
+            del_desc:"",
+
+
+            user_info: JSON.parse(localStorage.getItem('userinfo')),
+            username: localStorage.getItem('username'),
+             formInline: {
+                email: '',
+                password: '',
+                user_name:'',
+                address:'',
+                cellphone:'',
+                paypal_number:''
+            },
+            ruleInline: {
+                email: [
+                    { required: true, message: 'email cannot empty ', trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, message: 'password cannot empty', trigger: 'blur' },
+                    { type: 'string', min: 6, message: 'password length need large 6', trigger: 'blur' }
+                ],
+
+                user_name: [
+                    { required: true, message: 'user_name cannot empty ', trigger: 'blur' }
+                ],
+                address: [
+                    { required: true, message: 'address cannot empty ', trigger: 'blur' }
+                ],
+                cellphone: [
+                    { required: true, message: 'cellphone cannot empty ', trigger: 'blur' }
+                ],
+                paypal_number: [
+                    { required: true, message: 'paypal_number cannot empty ', trigger: 'blur' }
+                ]
+            }
+        },
+        mounted(){
+            this.formInline = JSON.parse(localStorage.getItem('userinfo'))
+        },
+        methods: {
+            click_header_menu(name){
+                window.location.href = name+".html";
+            },
+            handleSubmit(name) {
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        var data = this.formInline;
+                        data["id"] =localStorage.getItem('uid');
+                        apiAjax(APIURL.up_user_info,'post',data,(ret)=>{
+                            this.$Message.success("update success");
+                        })
+                    } else {
+                        this.$Message.error('check form file,please check');
+                    }
+                })
+            },
+            del_user(){
+                apiAjax(APIURL.del_user_info,'post',{
+                    uid: localStorage.getItem('uid'),
+                    desc: this.del_desc
+                },(ret)=>{
+                    window.location.href = "login.html"
+                })
+            }
+        }
+    })
+</script>
+</html>

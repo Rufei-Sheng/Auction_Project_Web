@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>post</title>
+    <link rel="stylesheet" type="text/css" href="./css/iview.css">
+    <script type="text/javascript" src="./js/vue.js"></script>
+    <script type="text/javascript" src="./js/iview.js"></script>
+
+    <script type="text/javascript" src="./js/jq.js"></script>
+    <script type="text/javascript" src="./js/common.js"></script>
+    <script type="text/javascript" src="./js/moment.js"></script>
+
+    <script src="//unpkg.com/iview/dist/locale/en-US.js"></script>
+    <style>
+        html, body, #app {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .layout {
+            border: 1px solid #d7dde4;
+            background: #f5f7f9;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .layout-logo {
+            width: 100px;
+            height: 30px;
+            background: #5b6270;
+            border-radius: 3px;
+            float: left;
+            position: relative;
+            top: 15px;
+            left: 20px;
+        }
+
+        .layout-nav {
+            /*width: 420px;*/
+            margin: 0 auto;
+            margin-right: 20px;
+        }
+
+        .ivu-layout-header {
+            padding: 0 0 0 50px;
+        }
+
+        .layout-logo {
+            width: auto;
+            height: 30px;
+            background: none;
+            line-height: 30px;
+            border-radius: 3px;
+            float: left;
+            position: relative;
+            top: 15px;
+            left: 20px;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .layout, .ivu-layout {
+            height: 100%;
+        }
+
+        .ivu-layout-sider {
+            background: #515a6e !important;
+        }
+
+        .layout-con {
+            height: 100%;
+            width: 100%;
+        }
+
+        .menu-item span {
+            display: inline-block;
+            overflow: hidden;
+            width: 120px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+            transition: width .2s ease .2s;
+        }
+
+        .menu-item i {
+            transform: translateX(0px);
+            transition: font-size .2s ease, transform .2s ease;
+            vertical-align: middle;
+            font-size: 16px;
+        }
+
+        .collapsed-menu span {
+            width: 0px;
+            transition: width .2s ease;
+        }
+
+        .collapsed-menu i {
+            transform: translateX(5px);
+            transition: font-size .2s ease .2s, transform .2s ease .2s;
+            vertical-align: middle;
+            font-size: 22px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+        <Header style=" background: #242f42; ">
+            <i-menu mode="horizontal" theme="dark" style=" background: #242f42;" @on-select=" click_header_menu ">
+                <div class="layout-logo" @click="  window.location.href='index.html' ">
+                    Publish Porduct
+                </div>
+                 <div class="layout-nav" style="float: right; ">
+                    <Submenu name="user"  v-if="username">>
+                        <template slot="title" >
+                            <Icon type="md-person" ></Icon>
+                             Welcome,{{ username }}
+                        </template>
+                        <Menu-Item name="like">
+                            My Like
+                        </Menu-Item>
+                        <Menu-Item name="account">
+                            My Account
+                        </Menu-Item>
+                        <Menu-Item name="auction">
+                            My Auction
+                        </Menu-Item>
+                        <Menu-Item name="post">
+                            My Post
+                        </Menu-Item>
+                         <Menu-Item name="post_list">
+                            My Post List
+                        </Menu-Item>
+                        <Menu-Item name="login">
+                            Login out
+                        </Menu-Item>
+                    </Submenu>
+                </div>
+            </i-menu>
+
+        </Header>
+        <Row>
+            <i-col span="12" offset="6" style="padding: 20px;">
+                <i-form class="ms-content" ref="formInline" :model="formInline" :rules="ruleInline"  :label-width="120"  label-position="left">
+                    <Form-Item prop="category" label="category">
+                        <i-select v-model="formInline.category" placeholder="Select Category">
+                            <i-option value="Furniture">Furniture</i-option>
+                            <i-option value="Electric Appliance">Electric Appliance</i-option>
+                        </i-select>
+                    </Form-Item>
+                    <Form-Item prop="sub_category" label="Sub category">
+                        <i-select v-model="formInline.sub_category" placeholder="Select Sub Category">
+                                <i-option  v-for="item in sub_categorys" :value="item">{{item }}</i-option>
+                        </i-select>
+                    </Form-Item>
+
+                    <Form-Item prop="product_photo" label="Product Photo">
+                        <i-input type="text" v-model="formInline.product_photo" placeholder="please enter Product Photo" clearable >
+                        </i-input>
+                    </Form-Item>
+
+                    <Form-Item prop="product_condition" label="Product Condition">
+                        <Radio-Group v-model="formInline.product_condition">
+                           <Radio label="poor">
+                                poor
+                           </Radio>
+                            <Radio label="average">
+                                average
+                           </Radio>
+                            <Radio label="good">
+                                good
+                           </Radio>
+                            <Radio label="excellent">
+                                excellent
+                           </Radio>
+                        </Radio-Group>
+                    </Form-Item>
+                    <Form-Item prop="min_price" label="Min Price">
+                       <input-number  v-model="formInline.min_price"   :min="1" placeholder="enter Min Price" style="width: 100px;" > </input-number>
+                    </Form-Item>
+                    <Form-Item prop="start_time" label="Start Time">
+                       <date-picker type="datetime"  v-model="formInline.start_time" format="yyyy-MM-dd HH:mm"  placeholder="Select Start Time" style="width: 200px"></date-picker>
+                    </Form-Item>
+                    <Form-Item prop="end_time" label="End Time">
+                       <date-picker type="datetime"  v-model="formInline.end_time" format="yyyy-MM-dd HH:mm"  placeholder="Select End Time" style="width: 200px"></date-picker>
+                    </Form-Item>
+                    <Form-Item prop="desc" label="Description">
+                        <i-input v-model="formInline.desc" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="Enter Description"></i-input>
+                    </Form-Item>
+
+
+                    <Form-Item prop="delivery" label="Delivery">
+                        <Radio-Group v-model="formInline.delivery">
+                           <Radio label="self mention">
+                                self mention
+                           </Radio>
+                            <Radio label="delivery">
+                                delivery
+                           </Radio>
+                        </Radio-Group>
+                    </Form-Item>
+
+                    <Form-Item prop="freight" label="Freight" v-if=" formInline.delivery == 'delivery' ">
+                       <input-number  v-model="formInline.freight"   :min="1" placeholder="enter" style="width: 100px;" ></input-number>
+                    </Form-Item>
+
+                    <i-button type="primary" long @click="handleSubmit('formInline')">sell</i-button>
+
+                </i-form>
+            </i-col>
+        </Row>
+</div>
+</body>
+<script>
+    iview.lang('en-US');
+    new Vue({
+        el: '#app',
+        data: {
+            username: localStorage.getItem('username'),
+            sub_categorys: [
+
+            ],
+            formInline: {
+                category:'',
+                sub_category:'',
+                product_photo: '',
+                product_condition:'',
+                min_price:'',
+                start_time:'',
+                end_time:'',
+                desc:'',
+                delivery:'',
+                freight: 0
+            },
+            ruleInline: {
+                category: [
+                    { required: true, message: 'Please select category', trigger: 'change' }
+                ],
+                sub_category: [
+                    { required: true, message: 'Please select sub_category', trigger: 'change' }
+                ],
+                product_photo: [
+                    { required: true, message: 'Please enter product_photo', trigger: 'blur' }
+                ],
+                product_condition: [
+                    { required: true, message: 'Please enter product_condition', trigger: 'change' }
+                ],
+                min_price: [
+                    {  type: 'number',required: true, message: 'Please enter min_price', trigger: 'blur' }
+                ],
+                start_time: [
+                    {type: 'date',  required: true, message: 'Please choose start_time', trigger: 'change' }
+                ],
+                end_time: [
+                    { type: 'date', required: true, message: 'Please choose end_time', trigger: 'change' }
+                ],
+                desc: [
+                    { required: true, message: 'Please enter desc', trigger: 'blur' }
+                ],
+                delivery: [
+                    { required: true, message: 'Please choose delivery', trigger: 'change' }
+                ]
+            }
+        },
+        watch:{
+             "formInline.category": function (now_value) {
+                let arr = [];
+                now_value == 'Furniture'?arr=[ "chair","table"]: arr=["refrigerator","television"];
+                this.formInline.sub_category = '';
+               this.sub_categorys = arr;
+            }
+        },
+        computed: {
+            menuitemClasses: function () {
+                return [
+                    'menu-item',
+                    this.isCollapsed ? 'collapsed-menu' : ''
+                ]
+            },
+
+        },
+        methods: {
+            handleSubmit(name){
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        this.formInline["user_id"] = localStorage.getItem('uid');
+                        this.formInline["start_time"] = moment(this.formInline["start_time"]).format("YYYY-MM-DD hh:mm:ss");
+                        this.formInline["end_time"] =  moment(this.formInline["end_time"]).format("YYYY-MM-DD hh:mm:ss");
+                        apiAjax(APIURL.publish,'post',this.formInline,(ret)=>{
+                            this.$Message.success("sell success");
+                            window.location.href = "index.html"
+                        })
+                    } else {
+                        this.$Message.error('check form file,please check');
+                    }
+                })
+            },
+
+            get_data(){
+
+            },
+            click_header_menu(name){
+                window.location.href = name+".html";
+            },
+            click_menu(menu){
+                if(this.username){
+                    this.welcome = false;
+                    this.get_data()
+                }else{
+                    window.location.href = "login.html";
+                }
+
+            }
+        }
+    })
+</script>
+</html>

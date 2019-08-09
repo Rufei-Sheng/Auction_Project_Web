@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>auction</title>
+    <link rel="stylesheet" type="text/css" href="./css/iview.css">
+    <script type="text/javascript" src="./js/vue.js"></script>
+    <script type="text/javascript" src="./js/iview.js"></script>
+
+    <script type="text/javascript" src="./js/jq.js"></script>
+    <script type="text/javascript" src="./js/common.js"></script>
+    <script type="text/javascript" src="./js/moment.js"></script>
+
+    <style>
+        html, body, #app {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .layout {
+            border: 1px solid #d7dde4;
+            background: #f5f7f9;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .layout-logo {
+            width: 100px;
+            height: 30px;
+            background: #5b6270;
+            border-radius: 3px;
+            float: left;
+            position: relative;
+            top: 15px;
+            left: 20px;
+        }
+
+        .layout-nav {
+            /*width: 420px;*/
+            margin: 0 auto;
+            margin-right: 20px;
+        }
+
+        .ivu-layout-header {
+            padding: 0 0 0 50px;
+        }
+
+        .layout-logo {
+            width: auto;
+            height: 30px;
+            background: none;
+            line-height: 30px;
+            border-radius: 3px;
+            float: left;
+            position: relative;
+            top: 15px;
+            left: 20px;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .layout, .ivu-layout {
+            height: 100%;
+        }
+
+        .ivu-layout-sider {
+            background: #515a6e !important;
+        }
+
+        .layout-con {
+            height: 100%;
+            width: 100%;
+        }
+
+        .menu-item span {
+            display: inline-block;
+            overflow: hidden;
+            width: 120px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+            transition: width .2s ease .2s;
+        }
+
+        .menu-item i {
+            transform: translateX(0px);
+            transition: font-size .2s ease, transform .2s ease;
+            vertical-align: middle;
+            font-size: 16px;
+        }
+
+        .collapsed-menu span {
+            width: 0px;
+            transition: width .2s ease;
+        }
+
+        .collapsed-menu i {
+            transform: translateX(5px);
+            transition: font-size .2s ease .2s, transform .2s ease .2s;
+            vertical-align: middle;
+            font-size: 22px;
+        }
+        .box div{
+            text-align: center;
+            color: #000;
+            font-size: 18px;
+            line-height: 40px;
+        }
+
+        .list{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            padding: 20px;
+        }
+        .list span{
+            line-height: 28px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <Header style=" background: #242f42; ">
+            <i-menu mode="horizontal" theme="dark" style=" background: #242f42;" @on-select=" click_header_menu ">
+                <div class="layout-logo" @click="  history.go(-1) ">
+                    My Auction
+                </div>
+                 <div class="layout-nav" style="float: right; ">
+
+                    <Submenu name="user"  >
+                        <template slot="title">
+                            <Icon type="md-person" ></Icon>
+                         Welcome,{{ username }}
+                        </template>
+                        <Menu-Item name="like">
+                            My Like
+                        </Menu-Item>
+                        <Menu-Item name="account">
+                            My Account
+                        </Menu-Item>
+                        <Menu-Item name="auction">
+                            My Auction
+                        </Menu-Item>
+                        <Menu-Item name="post">
+                            My Post
+                        </Menu-Item>
+                        <Menu-Item name="post_list">
+                            My Post List
+                        </Menu-Item>
+                        <Menu-Item name="login">
+                            Login out
+                        </Menu-Item>
+                    </Submenu>
+                </div>
+            </i-menu>
+
+        </Header>
+    <Row v-if="items.length">
+        <i-col span="6" v-for="item in items">
+            <div class="list"  @click=" pay_model = true; row = item  ">
+                <img width="150" height="150" :src="item.fields.product_photo" alt="">
+                <span>
+                    {{ item.fields.desc }}
+                </span>
+
+
+                 <i-button type="primary" v-if=" item.fields.end_success_user_id " >
+                    Purchased
+                </i-button>
+
+                <i-button type="primary" v-else-if=" item.fields.buy_user_id " >
+                    Payment
+                </i-button>
+            </div>
+       </i-col>
+   </Row>
+
+    <Modal v-model="pay_model"  title="pay you order" >
+            <div>
+                <i-input v-model="paypal_number" placeholder="please enter paypal number"></i-input>
+            </div>
+            <div style="margin-top: 10px;">
+                <i-input v-model="paypal_pawword" placeholder="please enter paypal pawword"></i-input>
+            </div>
+            <div slot="footer">
+                <i-button type="primary" size="large" @click="pay_number">Confirm</i-button>
+            </div>
+    </Modal>
+
+</div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            username: localStorage.getItem('username'),
+            split2: 0.5,
+            items:[],
+            pay_model: false,
+            paypal_number:"",
+            paypal_pawword:"",
+            row:""
+        },
+        computed: {
+
+        },
+        mounted(){
+            this.get_data();
+        },
+        methods: {
+            get_data(){
+                //get post list
+                apiAjax(APIURL.get_auction_list,'post',{
+                    user_id: localStorage.getItem('uid')
+                },(ret)=>{
+                    let arr = [];
+                    for(let value of ret.data){
+                        arr.push(JSON.parse(value)[0]);
+                    }
+                    // let data = JSON.parse(ret.data)
+                    console.log(arr);
+                    this.items = arr;
+                })
+            },
+            click_header_menu(name){
+                window.location.href = name+".html";
+            },
+            pay_number(){
+                //get post list
+                apiAjax(APIURL.update_end_success,'post',{
+                    uid: localStorage.getItem('uid'),
+                    pid: this.row.pk
+                },(ret)=>{
+                    this.$Message.success("buy success")
+                    this.pay_model = false;
+                    this.get_data()
+                })
+
+            }
+        }
+    })
+</script>
+</html>
